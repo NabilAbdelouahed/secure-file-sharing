@@ -1,3 +1,13 @@
+<?php
+session_start();
+
+if (isset($_SESSION['user_id']) && time() < $_SESSION['expires_at']) {
+    header("Location: dashboard.php");
+    exit;
+}
+
+?>
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -12,10 +22,12 @@
         <label for="username">Username</label>
         <input type="text" id="username" name="username" required>
         <label for="password">Password</label>
-        <input type="text" id="password" name="password" required>
+        <input type="password" id="password" name="password" required>
         <button type="submit">Login</button>
       </form>
-      <h3 id="loginStatus"></h3>
+      <?php if (isset($_SESSION['login_error'])): ?>
+        <h3 id="loginStatus" ><?php echo $_SESSION['login_error']; unset($_SESSION['login_error']); ?></h3>
+      <?php endif; ?>
     </div>
     
   </body>

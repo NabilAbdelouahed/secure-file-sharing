@@ -68,3 +68,11 @@ body {
 #loginForm button:hover {
   background-color: #0056b3;
 }
+
+h4 {
+  display: block;
+  font-weight: 600;
+  color: #333;
+  font-size: 0.9rem;
+  text-align: center;
+}

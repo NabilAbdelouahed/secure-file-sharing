@@ -25,6 +25,8 @@ if (isset($_SESSION['user_id']) && time() < $_SESSION['expires_at']) {
         <input type="password" id="password" name="password" required>
         <button type="submit">Login</button>
       </form>
+      <h4>Or</h4>
+      <button onclick="window.location.href='./signin.php'">Sign In</button>
       <?php if (isset($_SESSION['login_error'])): ?>
         <h3 id="loginStatus" ><?php echo $_SESSION['login_error']; unset($_SESSION['login_error']); ?></h3>
       <?php endif; ?>

@@ -7,12 +7,11 @@ try {
     die("DB connection failed: " . $e->getMessage());
 }
 
-function execute_query($query) {
+function execute_query($query, $params = []) {
     global $pdo;
     $stmt = $pdo->prepare($query);
-    $stmt->execute();
-    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    return $data;
+    $stmt->execute($params);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 function execute_non_query($query, $params = []) {
@@ -20,5 +19,3 @@ function execute_non_query($query, $params = []) {
     $stmt = $pdo->prepare($query);
     return $stmt->execute($params); 
 }
-
-print_r(execute_query("SELECT * FROM users"));

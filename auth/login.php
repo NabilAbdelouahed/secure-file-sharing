@@ -1,20 +1,26 @@
 <?php
 session_start();
 
-// Temporary hardcoded credentials (replace with DB later)
-$username = "nabil";
-$password = "nana";
-$user_id = 1;
+require_once("../database/db.php");
 
 function authenticate() {
-    global $username, $password, $user_id;
 
     if (isset($_POST["username"]) && isset($_POST["password"])) {
         $input_user = $_POST["username"];
         $input_pass = $_POST["password"];
 
-        if ($input_user === $username && $input_pass === $password) {
-            $_SESSION['user_id'] = $user_id;
+        $result = execute_query("SELECT * FROM users WHERE username = ?", [$input_user]);
+        
+        if (empty($result)) {
+            $_SESSION['login_error'] = "Invalid username";
+            header("Location: ../index.php");
+            exit;
+        }
+
+        $user = $result[0];
+        
+        if ($input_user === $user['username'] && $input_pass === $user['password_hash']) {
+            $_SESSION['user_id'] = $user['id'];
             $_SESSION['expires_at'] = time() + 3600;
             unset($_SESSION['login_error']);
             header("Location: ../dashboard.php");

@@ -19,7 +19,7 @@ function authenticate() {
 
         $user = $result[0];
         
-        if ($input_user === $user['username'] && $input_pass === $user['password_hash']) {
+        if ($input_user === $user['username'] && password_verify($input_pass, $user['password_hash'])) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['expires_at'] = time() + 3600;
             unset($_SESSION['login_error']);

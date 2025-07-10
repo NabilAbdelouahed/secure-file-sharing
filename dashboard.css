@@ -1,46 +1,116 @@
+/* Base styling */
 body {
   font-family: "Lato", sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f9f9f9;
+  color: #333;
 }
 
+/* Side navigation */
 .sidenav {
   height: 100%;
   width: 0;
   position: fixed;
-  z-index: 1;
+  z-index: 1000;
   top: 0;
   left: 0;
-  background-color: #333;
+  background-color: #2c3e50;
   overflow-x: hidden;
-  transition: 0.5s;
+  transition: 0.3s ease;
   padding-top: 60px;
 }
 
 .sidenav a {
-  padding: 8px 8px 8px 32px;
-  text-decoration: none;
-  font-size: 20px;
-  color: #818181;
+  padding: 12px 24px;
   display: block;
-  transition: 0.3s;
+  font-size: 18px;
+  color: #bdc3c7;
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 .sidenav a:hover {
-  color: #f1f1f1;
+  color: #ffffff;
+  background-color: #34495e;
 }
 
 .sidenav .closebtn {
   position: absolute;
-  top: 0;
-  right: 25px;
-  font-size: 36px;
-  margin-left: 50px;
+  top: 10px;
+  right: 20px;
+  font-size: 30px;
+  color: #ecf0f1;
+  cursor: pointer;
 }
 
-@media screen and (max-height: 450px) {
-  .sidenav {padding-top: 15px;}
-  .sidenav a {font-size: 18px;}
-}
-
+/* Header and welcome message */
 h2 {
-    text-align: center;
+  text-align: center;
+  margin-top: 20px;
+  color: #2c3e50;
+}
+
+span[onclick="openNav()"] {
+  font-size: 30px;
+  cursor: pointer;
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  color: #2c3e50;
+}
+
+/* File upload form */
+#fileUpload {
+  margin: 40px auto;
+  max-width: 400px;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+#fileUpload input[type="file"] {
+  margin-bottom: 15px;
+}
+
+#fileUpload input[type="submit"] {
+  background-color: #3498db;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#fileUpload input[type="submit"]:hover {
+  background-color: #2980b9;
+}
+
+/* Logout button */
+form[action*="logout.php"] {
+  text-align: center;
+  margin-top: 20px;
+}
+
+form[action*="logout.php"] button {
+  background-color: #e74c3c;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+form[action*="logout.php"] button:hover {
+  background-color: #c0392b;
+}
+
+/* Responsive tweaks */
+@media screen and (max-height: 450px) {
+  .sidenav { padding-top: 15px; }
+  .sidenav a { font-size: 16px; }
 }

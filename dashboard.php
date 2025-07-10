@@ -32,8 +32,14 @@ $username = $user[0]['username'] ?? 'User';
     </div>
     
     <h2>Welcome  <?php echo htmlspecialchars($username); ?> </h2>
-    <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
-    
+    <span onclick="openNav()">&#9776;</span>
+
+    <form id="fileUpload" action="upload.php" method="post" enctype="multipart/form-data">
+      <label for="fileToUpload">Select file to upload:</label><br>
+      <input type="file" name="fileToUpload" id="fileToUpload"><br>
+      <input type="submit" value="Upload Image" name="submit">
+    </form>
+
     <script>
     function openNav() {
       document.getElementById("mySidenav").style.width = "250px";

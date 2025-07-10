@@ -1,9 +1,16 @@
 <?php
+
+require_once("./database/db.php");
+
 session_start();
 if (!isset($_SESSION['user_id']) || time() > $_SESSION['expires_at']) {
     header("Location: index.php");
     exit;
 }
+
+$user = execute_query("SELECT username FROM users WHERE id = ?", [$_SESSION['user_id']]);
+$username = $user[0]['username'] ?? 'User';
+
 ?>
 
 <!doctype html>
@@ -24,7 +31,7 @@ if (!isset($_SESSION['user_id']) || time() > $_SESSION['expires_at']) {
       <a href="#">Logout</a>
     </div>
     
-    <h2>Welcome</h2>
+    <h2>Welcome  <?php echo htmlspecialchars($username); ?> </h2>
     <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
     
     <script>

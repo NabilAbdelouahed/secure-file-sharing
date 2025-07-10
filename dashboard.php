@@ -35,8 +35,15 @@ $username = $user[0]['username'] ?? 'User';
     <span onclick="openNav()">&#9776;</span>
 
     <form id="fileUpload" action="upload.php" method="post" enctype="multipart/form-data">
-      <label for="fileToUpload">Select file to upload:</label><br>
-      <input type="file" name="fileToUpload" id="fileToUpload"><br>
+      <label for="fileToUpload">Select file to upload:</label><br/>
+      <input type="file" name="fileToUpload" id="fileToUpload" required onchange="validateFileSize(this)"><br/>
+      <input type="password" name="uploadPassword" id="uploadPassword" placeholder="enter password"><br/>
+      <select name="uploadExpiry" id="uploadExpiry" >
+      <option value="1">--Choose an expiry date--</option>
+      <option value="1">1 day</option>
+      <option value="2">2 days</option>
+      <option value="7">7 days</option>
+    </select><br/>
       <input type="submit" value="Upload Image" name="submit">
     </form>
 
@@ -48,7 +55,17 @@ $username = $user[0]['username'] ?? 'User';
     function closeNav() {
       document.getElementById("mySidenav").style.width = "0";
     }
+      function validateFileSize(input) {
+    const maxSize = 10 * 1024 * 1024; // 10 MB
+    if (input.files[0].size > maxSize) {
+      alert("File is too large! Must be under 10MB.");
+      input.value = ""; // Clear the input
+    }
+    }
     </script>
+    <?php if (isset($_SESSION['upload_status'])): ?>
+      <h3 id="uploadStatus" ><?php echo $_SESSION['upload_status']; unset($_SESSION['upload_status']); ?></h3>
+    <?php endif; ?>
     <form method="post" action="./auth/logout.php">
       <button type="submit">Logout</button>
     </form>

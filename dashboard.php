@@ -22,17 +22,8 @@ $username = $user[0]['username'] ?? 'User';
     <link rel="stylesheet" type="text/css" href="./dashboard.css" />
   </head>
   <body>
-    <div id="mySidenav" class="sidenav">
-      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-      <a href="#">Upload file</a>
-      <a href="#">My files</a>
-      <a href="#">Change username</a>
-      <a href="#">Change password</a>
-      <a href="#">Logout</a>
-    </div>
     
     <h2>Welcome  <?php echo htmlspecialchars($username); ?> </h2>
-    <span onclick="openNav()">&#9776;</span>
 
     <form id="fileUpload" action="upload.php" method="post" enctype="multipart/form-data">
       <label for="fileToUpload">Select file to upload:</label><br/>

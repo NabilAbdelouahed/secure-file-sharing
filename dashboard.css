@@ -7,42 +7,6 @@ body {
   color: #333;
 }
 
-/* Side navigation */
-.sidenav {
-  height: 100%;
-  width: 0;
-  position: fixed;
-  z-index: 1000;
-  top: 0;
-  left: 0;
-  background-color: #2c3e50;
-  overflow-x: hidden;
-  transition: 0.3s ease;
-  padding-top: 60px;
-}
-
-.sidenav a {
-  padding: 12px 24px;
-  display: block;
-  font-size: 18px;
-  color: #bdc3c7;
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-.sidenav a:hover {
-  color: #ffffff;
-  background-color: #34495e;
-}
-
-.sidenav .closebtn {
-  position: absolute;
-  top: 10px;
-  right: 20px;
-  font-size: 30px;
-  color: #ecf0f1;
-  cursor: pointer;
-}
 
 /* Header and welcome message */
 h2 {

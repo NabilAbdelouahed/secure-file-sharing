@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
            : true;
 
     if ($ok) {
-        $_SESSION['allowed_downloads'][$fileId] = true;
+        
     } else {
         sleep(1);
     }

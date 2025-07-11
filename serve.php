@@ -8,11 +8,6 @@ if (!isset($_GET['file'])) {
 }
 $fileId = basename($_GET['file']);
 
-if (empty($_SESSION['allowed_downloads'][$fileId])) {
-    http_response_code(403);
-    die("Access denied.");
-}
-unset($_SESSION['allowed_downloads'][$fileId]);
 
 $file = execute_query("SELECT * FROM files WHERE id = ?", [$fileId]);
 if (!$file) {

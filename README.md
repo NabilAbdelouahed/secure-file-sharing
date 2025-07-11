@@ -37,7 +37,6 @@ cd secure-file-sharing
 ### 2. Start the server
 ```
 php -S localhost:8000
-
 ```
 
 Then visit: http://localhost:8000
@@ -52,6 +51,6 @@ Then visit: http://localhost:8000
 
 - To avoid abuse, log upload/download attempts and throttle per user/IP.
 
-- Set max download numer at upload
+- Set max download number at upload
 
 - Scan uploaded files for viruses/malware (using ClamAV for example which is free and open source)

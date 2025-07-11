@@ -57,7 +57,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $expiresAt
         ]);
 
+        $downloadLink = "https://" . $_SERVER['HTTP_HOST'] . "/download.php?file=" . urlencode($storedName);
         $_SESSION['upload_status'] = "Upload successful";
+        $_SESSION['download_link'] = $downloadLink; 
         header("Location: dashboard.php");
         exit;
     } else {

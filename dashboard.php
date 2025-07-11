@@ -57,6 +57,17 @@ $username = $user[0]['username'] ?? 'User';
     <?php if (isset($_SESSION['upload_status'])): ?>
       <h3 id="uploadStatus" ><?php echo $_SESSION['upload_status']; unset($_SESSION['upload_status']); ?></h3>
     <?php endif; ?>
+
+    <?php if (isset($_SESSION['download_link'])): ?>
+      <p id="downloadLink">
+        <strong>Download Link:</strong><br/>
+        <a href="<?php echo htmlspecialchars($_SESSION['download_link']); ?>" target="_blank">
+          <?php echo htmlspecialchars($_SESSION['download_link']); ?>
+        </a>
+      </p>
+      <?php unset($_SESSION['download_link']); ?>
+    <?php endif; ?>
+
     <form method="post" action="./auth/logout.php">
       <button type="submit">Logout</button>
     </form>

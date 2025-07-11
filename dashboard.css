@@ -102,3 +102,17 @@ form[action*="logout.php"] button:hover {
   text-align: center;
   font-size: 16px;
 }
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 1rem;
+}
+th, td {
+  border: 1px solid #ccc;
+  text-align: left;
+  padding: 0.5rem;
+}
+th {
+  background-color: #f0f0f0;
+}

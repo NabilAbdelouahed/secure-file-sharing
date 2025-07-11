@@ -11,6 +11,12 @@ if (!isset($_SESSION['user_id']) || time() > $_SESSION['expires_at']) {
 $user = execute_query("SELECT username FROM users WHERE id = ?", [$_SESSION['user_id']]);
 $username = $user[0]['username'] ?? 'User';
 
+$files = execute_query("
+    SELECT id, original_name, password_hash, expires_at
+    FROM files
+    WHERE user_id = ? AND (expires_at IS NULL OR expires_at > datetime('now'))
+", [$_SESSION['user_id']]);
+
 ?>
 
 <!doctype html>
@@ -35,7 +41,7 @@ $username = $user[0]['username'] ?? 'User';
       <option value="2">2 days</option>
       <option value="7">7 days</option>
     </select><br/>
-      <input type="submit" value="Upload Image" name="submit">
+      <input type="submit" value="Upload File" name="submit">
     </form>
 
     <script>
@@ -50,7 +56,7 @@ $username = $user[0]['username'] ?? 'User';
     const maxSize = 10 * 1024 * 1024; // 10 MB
     if (input.files[0].size > maxSize) {
       alert("File is too large! Must be under 10MB.");
-      input.value = ""; // Clear the input
+      input.value = ""; 
     }
     }
     </script>
@@ -66,6 +72,49 @@ $username = $user[0]['username'] ?? 'User';
         </a>
       </p>
       <?php unset($_SESSION['download_link']); ?>
+    <?php endif; ?>
+    
+    <?php if (!empty($files)): ?>
+      <h3>Your Active Files</h3>
+      <table cellpadding="8" cellspacing="0">
+        <thead>
+          <tr>
+            <th>Filename</th>
+            <th>Download Link</th>
+            <th>Password Protected</th>
+            <th>Expires At</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($files as $file): ?>
+            <tr>
+              <td><?php echo htmlspecialchars($file['original_name']); ?></td>
+              <td>
+                <a href="download.php?file=<?php echo urlencode($file['id']); ?>" target="_blank">
+                  Download
+                </a>
+              </td>
+              <td><?php echo empty($file['password_hash']) ? 'No' : 'Yes'; ?></td>
+              <td>
+                <?php
+                  echo $file['expires_at']
+                    ? htmlspecialchars(date('Y-m-d H:i', strtotime($file['expires_at'])))
+                    : 'Never';
+                ?>
+              </td>
+              <td>
+                <form method="post" action="expireFile.php" style="margin:0">
+                <input type="hidden" name="file_id" value="<?php echo (int)$file['id']; ?>">
+                <button type="submit">Expire now</button>
+                </form>
+              </td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    <?php else: ?>
+      <p>You have no active files.</p>
     <?php endif; ?>
 
     <form method="post" action="./auth/logout.php">

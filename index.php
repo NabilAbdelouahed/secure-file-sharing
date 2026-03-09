@@ -2,7 +2,7 @@
 session_start();
 
 if (isset($_SESSION['user_id']) && time() < $_SESSION['expires_at']) {
-    header("Location: dashboard.php");
+    header("Location: " . (!empty($_SESSION['is_admin']) ? 'admin.php' : 'dashboard.php'));
     exit;
 }
 

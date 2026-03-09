@@ -21,9 +21,15 @@ function authenticate() {
         
         if ($input_user === $user['username'] && password_verify($input_pass, $user['password_hash'])) {
             $_SESSION['user_id'] = $user['id'];
+            $_SESSION['is_admin'] = !empty($user['is_admin']);
             $_SESSION['expires_at'] = time() + 3600;
             unset($_SESSION['login_error']);
-            header("Location: ../dashboard.php");
+
+            if ($_SESSION['is_admin']) {
+                header("Location: ../admin.php");
+            } else {
+                header("Location: ../dashboard.php");
+            }
             exit;
         }
     }

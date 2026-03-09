@@ -29,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($inserted) {
                 $user = execute_query("SELECT id FROM users WHERE username = ?", [$username]);
+                session_regenerate_id(true);
                 $_SESSION['user_id'] = $user[0]["id"];
                 $_SESSION['expires_at'] = time() + 3600;
                 header("Location: dashboard.php");

@@ -20,6 +20,7 @@ function authenticate() {
         $user = $result[0];
         
         if ($input_user === $user['username'] && password_verify($input_pass, $user['password_hash'])) {
+            session_regenerate_id(true);
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['is_admin'] = !empty($user['is_admin']);
             $_SESSION['expires_at'] = time() + 3600;

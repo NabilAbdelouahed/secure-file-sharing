@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['file_id'])) {
     // Only update files that belong to the current user
     execute_query("
         UPDATE files
-        SET expires_at = datetime('now')
+        SET expires_at = NOW()
         WHERE id = ? AND user_id = ?
     ", [$fileId, $_SESSION['user_id']]);
 }

@@ -1,6 +1,6 @@
 # secure-file-sharing
 
-A simple, secure, and self-hosted file-sharing web application written in PHP + SQLite.
+A simple, secure, and self-hosted file-sharing web application written in PHP + PostgreSQL, fully dockerised.
 Supports user authentication, password-protected uploads, file expiry, and a clean user dashboard to manage files.
 
 ## Features
@@ -22,11 +22,13 @@ Supports user authentication, password-protected uploads, file expiry, and a cle
 
         Expiration check
 
-- SQLite database (easy to set up)
+- PostgreSQL database (via Docker)
 
 - Clean and responsive interface
 
 - Written in plain PHP (no frameworks)
+
+- Fully dockerised (app + database)
 
 ## Setup
 ### 1. Clone the Repository
@@ -34,12 +36,22 @@ Supports user authentication, password-protected uploads, file expiry, and a cle
 git clone https://github.com/NabilAbdelouahed/secure-file-sharing.git
 cd secure-file-sharing
 ```
-### 2. Start the server
+### 2. Start with Docker
 ```
-php -S localhost:8000
+docker compose up --build
 ```
 
-Then visit: http://localhost:8000
+Then visit: http://localhost:8080
+
+### Stopping
+```
+docker compose down
+```
+
+To also remove the database volume:
+```
+docker compose down -v
+```
 
 ![alt text](imgs/login.png)
 ![alt text](imgs/signin.png)

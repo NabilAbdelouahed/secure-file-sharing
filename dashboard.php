@@ -14,7 +14,7 @@ $username = $user[0]['username'] ?? 'User';
 $files = execute_query("
     SELECT id, original_name, password_hash, expires_at
     FROM files
-    WHERE user_id = ? AND (expires_at IS NULL OR expires_at > datetime('now'))
+    WHERE user_id = ? AND (expires_at IS NULL OR expires_at > NOW())
 ", [$_SESSION['user_id']]);
 
 ?>
@@ -114,7 +114,7 @@ $files = execute_query("
         </tbody>
       </table>
     <?php else: ?>
-      <p>You have no active files.</p>
+      <p style="text-align: center;">You have no active files.</p>
     <?php endif; ?>
 
     <form method="post" action="./auth/logout.php">

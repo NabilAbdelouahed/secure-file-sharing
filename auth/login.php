@@ -12,7 +12,7 @@ function authenticate() {
         $result = execute_query("SELECT * FROM users WHERE username = ?", [$input_user]);
         
         if (empty($result)) {
-            $_SESSION['login_error'] = "Invalid username";
+            $_SESSION['login_error'] = "Invalid credentials";
             header("Location: ../index.php");
             exit;
         }

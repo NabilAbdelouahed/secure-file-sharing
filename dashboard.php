@@ -24,125 +24,155 @@ $files = execute_query("
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Upload files</title>
+    <title>Dashboard - SecureShare</title>
     <link rel="stylesheet" type="text/css" href="./dashboard.css" />
   </head>
   <body>
-    
-    <h2>Welcome  <?php echo htmlspecialchars($username); ?> </h2>
+    <nav class="topbar">
+      <div class="topbar-brand">SecureShare</div>
+      <div class="topbar-actions">
+        <span class="topbar-user"><?php echo htmlspecialchars($username); ?></span>
+        <form method="post" action="./auth/logout.php" style="margin:0">
+          <button type="submit" class="btn-logout">Logout</button>
+        </form>
+      </div>
+    </nav>
 
-    <form id="fileUpload" action="upload.php" method="post" enctype="multipart/form-data">
-      <label for="fileToUpload">Select file to upload:</label><br/>
-      <input type="file" name="fileToUpload" id="fileToUpload" required onchange="validateFileSize(this)"><br/>
-      <input type="password" name="uploadPassword" id="uploadPassword" placeholder="enter password"><br/>
-      <select name="uploadExpiry" id="uploadExpiry" >
-      <option value="1">--Choose an expiry date--</option>
-      <option value="1">1 day</option>
-      <option value="2">2 days</option>
-      <option value="7">7 days</option>
-    </select><br/>
-      <input type="submit" value="Upload File" name="submit">
-    </form>
+    <main class="container">
+      <!-- Upload Section -->
+      <div class="card">
+        <h3 class="section-title">Upload File</h3>
+        <form id="fileUpload" action="upload.php" method="post" enctype="multipart/form-data">
+          <div class="form-group">
+            <label for="fileToUpload">Select file (max 10MB)</label>
+            <input type="file" name="fileToUpload" id="fileToUpload" class="form-control" required onchange="validateFileSize(this)">
+          </div>
+          <div class="form-group">
+            <label for="uploadPassword">Password protection (optional)</label>
+            <input type="password" name="uploadPassword" id="uploadPassword" class="form-control" placeholder="Leave empty for no password">
+          </div>
+          <div class="form-group">
+            <label for="uploadExpiry">Expiry</label>
+            <select name="uploadExpiry" id="uploadExpiry" class="form-control">
+              <option value="1">1 day</option>
+              <option value="2">2 days</option>
+              <option value="7">7 days</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">Upload File</button>
+        </form>
+      </div>
 
-    <script>
-    function openNav() {
-      document.getElementById("mySidenav").style.width = "250px";
-    }
-    
-    function closeNav() {
-      document.getElementById("mySidenav").style.width = "0";
-    }
+      <script>
       function validateFileSize(input) {
-    const maxSize = 10 * 1024 * 1024; // 10 MB
-    if (input.files[0].size > maxSize) {
-      alert("File is too large! Must be under 10MB.");
-      input.value = ""; 
-    }
-    }
-    </script>
-    <?php if (isset($_SESSION['upload_status'])): ?>
-      <h3 id="uploadStatus" ><?php echo $_SESSION['upload_status']; unset($_SESSION['upload_status']); ?></h3>
-    <?php endif; ?>
+        var maxSize = 10 * 1024 * 1024;
+        if (input.files[0] && input.files[0].size > maxSize) {
+          alert("File is too large! Must be under 10MB.");
+          input.value = "";
+        }
+      }
+      </script>
 
-    <?php if (isset($_SESSION['download_link'])): ?>
-      <p id="downloadLink">
-        <strong>Download Link:</strong><br/>
-        <a href="<?php echo htmlspecialchars($_SESSION['download_link']); ?>" target="_blank">
-          <?php echo htmlspecialchars($_SESSION['download_link']); ?>
-        </a>
-      </p>
-      <?php unset($_SESSION['download_link']); ?>
-    <?php endif; ?>
-    
-    <?php if (!empty($files)): ?>
-      <h3>Your Active Files</h3>
-      <table cellpadding="8" cellspacing="0">
-        <thead>
-          <tr>
-            <th>Filename</th>
-            <th>Download Link</th>
-            <th>Password Protected</th>
-            <th>Expires At</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php foreach ($files as $file): ?>
-            <tr>
-              <td><?php echo htmlspecialchars($file['original_name']); ?></td>
-              <td>
-                <a href="download.php?file=<?php echo urlencode($file['id']); ?>" target="_blank">
-                  Download
-                </a>
-              </td>
-              <td><?php echo empty($file['password_hash']) ? 'No' : 'Yes'; ?></td>
-              <td>
-                <?php if ($file['expires_at']): ?>
-                  <span class="utc-date" data-utc="<?php echo htmlspecialchars($file['expires_at']); ?>"></span>
-                <?php else: ?>
-                  Never
-                <?php endif; ?>
-              </td>
-              <td>
-                <form method="post" action="expireFile.php" style="margin:0">
-                <input type="hidden" name="file_id" value="<?php echo (int)$file['id']; ?>">
-                <button type="submit">Expire now</button>
-                </form>
-              </td>
-            </tr>
-          <?php endforeach; ?>
-        </tbody>
-      </table>
-    <?php else: ?>
-      <p style="text-align: center;">You have no active files.</p>
-    <?php endif; ?>
+      <?php if (isset($_SESSION['upload_status'])): ?>
+        <div class="alert alert-info"><?php echo htmlspecialchars($_SESSION['upload_status']); unset($_SESSION['upload_status']); ?></div>
+      <?php endif; ?>
 
-    <script>
-    document.querySelectorAll('.utc-date').forEach(function(el) {
-      var utc = el.getAttribute('data-utc');
-      var date = new Date(utc + 'Z');
-      var year = date.getFullYear();
-      var month = String(date.getMonth() + 1).padStart(2, '0');
-      var day = String(date.getDate()).padStart(2, '0');
-      var hours = String(date.getHours()).padStart(2, '0');
-      var minutes = String(date.getMinutes()).padStart(2, '0');
-      el.textContent = year + '-' + month + '-' + day + ' ' + hours + ':' + minutes;
-    });
-    </script>
+      <?php if (isset($_SESSION['download_link'])): ?>
+        <div class="download-link">
+          <strong>Download Link:</strong><br/>
+          <a href="<?php echo htmlspecialchars($_SESSION['download_link']); ?>" target="_blank">
+            <?php echo htmlspecialchars($_SESSION['download_link']); ?>
+          </a>
+        </div>
+        <?php unset($_SESSION['download_link']); ?>
+      <?php endif; ?>
 
-    <h3>Change Password</h3>
-    <form id="changePassword" method="post" action="./auth/change_password.php">
-      <input type="password" name="current_password" placeholder="Current password" required><br/>
-      <input type="password" name="new_password" placeholder="New password (min 8 chars)" required minlength="8"><br/>
-      <input type="password" name="confirm_password" placeholder="Confirm new password" required minlength="8"><br/>
-      <input type="submit" value="Change Password">
-    </form>
-    <?php if (isset($_SESSION['password_status'])): ?>
-      <p id="passwordStatus"><?php echo htmlspecialchars($_SESSION['password_status']); unset($_SESSION['password_status']); ?></p>
-    <?php endif; ?>
+      <!-- Files Table -->
+      <div class="card">
+        <h3 class="section-title">Your Active Files</h3>
+        <?php if (!empty($files)): ?>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Filename</th>
+                <th>Download</th>
+                <th>Protected</th>
+                <th>Expires</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php foreach ($files as $file): ?>
+              <tr>
+                <td><?php echo htmlspecialchars($file['original_name']); ?></td>
+                <td>
+                  <a href="download.php?file=<?php echo urlencode($file['id']); ?>" target="_blank">Download</a>
+                </td>
+                <td>
+                  <?php if (empty($file['password_hash'])): ?>
+                    <span class="badge badge-no">No</span>
+                  <?php else: ?>
+                    <span class="badge badge-yes">Yes</span>
+                  <?php endif; ?>
+                </td>
+                <td>
+                  <?php if ($file['expires_at']): ?>
+                    <span class="utc-date" data-utc="<?php echo htmlspecialchars($file['expires_at']); ?>"></span>
+                  <?php else: ?>
+                    Never
+                  <?php endif; ?>
+                </td>
+                <td>
+                  <form method="post" action="expireFile.php" style="margin:0">
+                    <input type="hidden" name="file_id" value="<?php echo (int)$file['id']; ?>">
+                    <button type="submit" class="btn btn-danger">Expire</button>
+                  </form>
+                </td>
+              </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        </div>
+        <?php else: ?>
+          <p class="empty-state">No active files. Upload a file to get started.</p>
+        <?php endif; ?>
+      </div>
 
-    <form method="post" action="./auth/logout.php">
-      <button type="submit">Logout</button>
-    </form>
+      <script>
+      document.querySelectorAll('.utc-date').forEach(function(el) {
+        var utc = el.getAttribute('data-utc');
+        var date = new Date(utc + 'Z');
+        var year = date.getFullYear();
+        var month = String(date.getMonth() + 1).padStart(2, '0');
+        var day = String(date.getDate()).padStart(2, '0');
+        var hours = String(date.getHours()).padStart(2, '0');
+        var minutes = String(date.getMinutes()).padStart(2, '0');
+        el.textContent = year + '-' + month + '-' + day + ' ' + hours + ':' + minutes;
+      });
+      </script>
+
+      <!-- Change Password -->
+      <div class="card">
+        <h3 class="section-title">Change Password</h3>
+        <form id="changePassword" method="post" action="./auth/change_password.php">
+          <div class="form-group">
+            <input type="password" name="current_password" class="form-control" placeholder="Current password" required>
+          </div>
+          <div class="form-group">
+            <input type="password" name="new_password" class="form-control" placeholder="New password (min 8 chars)" required minlength="8">
+          </div>
+          <div class="form-group">
+            <input type="password" name="confirm_password" class="form-control" placeholder="Confirm new password" required minlength="8">
+          </div>
+          <button type="submit" class="btn btn-primary">Change Password</button>
+        </form>
+        <?php if (isset($_SESSION['password_status'])): ?>
+          <div class="alert <?php echo strpos($_SESSION['password_status'], 'successfully') !== false ? 'alert-success' : 'alert-error'; ?>" style="margin-top: 1rem;">
+            <?php echo htmlspecialchars($_SESSION['password_status']); unset($_SESSION['password_status']); ?>
+          </div>
+        <?php endif; ?>
+      </div>
+    </main>
   </body>
 </html>

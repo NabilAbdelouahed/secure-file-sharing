@@ -15,6 +15,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($password !== $password2) {
         $_SESSION['signin_error'] = "Passwords do not match.";
+    } elseif (strlen($password) < 8) {
+        $_SESSION['signin_error'] = "Password must be at least 8 characters.";
     } else {
         $result = execute_query("SELECT * FROM users WHERE username = ?", [$username]);
 
@@ -51,24 +53,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login</title>
+  <title>Sign Up - SecureShare</title>
   <link rel="stylesheet" type="text/css" href="./login.css" />
 </head>
 <body>
-  <div id="loginForm">
-    <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
-      <label for="username">Username</label>
-      <input type="text" id="username" name="username" required>
-      <label for="password">Password</label>
-      <input type="password" id="password" name="password" required>
-      <label for="password2">Verify Password</label>
-      <input type="password" id="password2" name="password2" required>
-      <button type="submit">Sign In</button>
-    </form>
-
-    <?php if (isset($_SESSION['signin_error'])): ?>
-      <h3 id="loginStatus"><?php echo $_SESSION['signin_error']; unset($_SESSION['signin_error']); ?></h3>
-    <?php endif; ?>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <h1>SecureShare</h1>
+        <p>Create your account</p>
+      </div>
+      <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required minlength="8" placeholder="Min. 8 characters">
+        </div>
+        <div class="form-group">
+          <label for="password2">Confirm Password</label>
+          <input type="password" id="password2" name="password2" required minlength="8">
+        </div>
+        <button type="submit" class="btn btn-primary">Create Account</button>
+      </form>
+      <div class="divider">or</div>
+      <button class="btn btn-secondary" onclick="window.location.href='./index.php'">Back to Login</button>
+      <?php if (isset($_SESSION['signin_error'])): ?>
+        <div class="alert alert-error"><?php echo htmlspecialchars($_SESSION['signin_error']); unset($_SESSION['signin_error']); ?></div>
+      <?php endif; ?>
+    </div>
   </div>
 </body>
 </html>

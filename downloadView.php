@@ -5,54 +5,65 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Download “<?= htmlspecialchars($displayName, ENT_QUOTES) ?>”</title>
   <style>
-    html, body { height:100%; margin:0; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #f7f7f7;
-      font-family: sans-serif;
+      min-height: 100vh;
+      background: #f1f5f9;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
     }
     .container {
       background: #fff;
-      padding: 2rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 2.5rem;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
       text-align: center;
-      max-width: 90%;
+      max-width: 420px;
+      width: 90%;
+    }
+    .container h1 {
+      font-size: 1.25rem;
+      color: #1e293b;
+      margin-bottom: 0.5rem;
+      word-break: break-word;
+    }
+    #status {
+      color: #64748b;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
     }
     #downloadBtn {
       display: none;
-      margin-top: 1rem;
-      padding: 0.6rem 1.2rem;
-      background: #007bff;
+      margin-top: 1.25rem;
+      padding: 0.7rem 1.5rem;
+      background: #059669;
       color: #fff;
       text-decoration: none;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
       font-size: 1rem;
+      font-weight: 600;
+      transition: background 0.2s;
     }
     #downloadBtn:hover {
-      background: #0056b3;
-    }
-    #status {
-      margin-top: 1rem;
-      color: #555;
+      background: #047857;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>📄 <?= htmlspecialchars($displayName, ENT_QUOTES) ?></h1>
+    <h1><?= htmlspecialchars($displayName, ENT_QUOTES) ?></h1>
     <p id="status">
       <?= $passwordProtected
-         ? 'This file is password‑protected.'
+         ? 'This file is password protected.'
          : 'Click below to download.' ?>
     </p>
 
     <button id="downloadBtn" style="display:none">
-      ▶ Download “<?= htmlspecialchars($displayName, ENT_QUOTES) ?>”
+      Download "<?= htmlspecialchars($displayName, ENT_QUOTES) ?>"
     </button>
   </div>
 
@@ -76,7 +87,7 @@
     }
 
     var pwd = prompt(
-      "This file is password‑protected.\nPlease enter the password:"
+      "This file is password protected.\nPlease enter the password:"
     );
     if (pwd === null) {
       statusEl.textContent = "Password required to download.";

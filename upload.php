@@ -12,6 +12,12 @@ if (!is_dir($uploadDir)) {
     mkdir($uploadDir, 0755, true);
 }
 
+function respondWithError($message) {
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'error' => $message]);
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_FILES['fileToUpload']) && $_FILES['fileToUpload']['error'] === UPLOAD_ERR_OK) {
         $file = $_FILES['fileToUpload'];
@@ -19,13 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $tmpPath = $file['tmp_name'];
         $size = $file['size'];
 
-        $allowedTypes = ['image/jpeg', 'image/png', 'application/pdf', 'text/plain'];
-        if (!in_array(mime_content_type($tmpPath), $allowedTypes)) {
-            die("File type not allowed.");
-        }
-
         if ($size > 10 * 1024 * 1024) { // 10MB max
-            die("File is too large.");
+            respondWithError("File is too large.");
         }
 
         $storedName = uniqid() . "_" . $originalName;
@@ -60,15 +61,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $expiresAt
         ]);
 
-        $downloadLink = "http://" . $_SERVER['HTTP_HOST'] . "/download.php?file=" . urlencode($shareToken);
-        $_SESSION['upload_status'] = "Upload successful";
-        $_SESSION['download_link'] = $downloadLink; 
-        header("Location: dashboard.php");
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true, 'shareToken' => $shareToken]);
         exit;
     } else {
-        $_SESSION['upload_status'] = "Upload failed. Error: " . $_FILES['fileToUpload']['error'];
-        header("Location: dashboard.php");
-        exit;
+        respondWithError("Upload failed. Error: " . $_FILES['fileToUpload']['error']);
     }
 } else {
     echo "Invalid request.";

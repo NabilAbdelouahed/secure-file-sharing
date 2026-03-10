@@ -26,6 +26,7 @@ $files = execute_query("
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Dashboard - SecureShare</title>
     <link rel="stylesheet" type="text/css" href="./dashboard.css" />
+    <script src="./crypto.js"></script>
   </head>
   <body>
     <nav class="topbar">
@@ -71,20 +72,102 @@ $files = execute_query("
           input.value = "";
         }
       }
+
+      function showUploadResult(link) {
+        var existing = document.querySelector('.upload-result');
+        if (existing) existing.remove();
+        var existingAlert = document.querySelector('.alert-info');
+        if (existingAlert) existingAlert.remove();
+
+        var alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-info';
+        alertDiv.textContent = 'Upload successful (end-to-end encrypted)';
+
+        var container = document.createElement('div');
+        container.className = 'upload-result download-link';
+
+        var strong = document.createElement('strong');
+        strong.textContent = 'Download Link:';
+        container.appendChild(strong);
+        container.appendChild(document.createElement('br'));
+
+        var a = document.createElement('a');
+        a.href = link;
+        a.target = '_blank';
+        a.textContent = link;
+        container.appendChild(a);
+
+        container.appendChild(document.createElement('br'));
+
+        var warning = document.createElement('small');
+        warning.style.color = '#ef4444';
+        warning.textContent = '\u26A0 Save this link! It contains the encryption key (after #). Without it, the file cannot be decrypted.';
+        container.appendChild(warning);
+
+        var uploadCard = document.getElementById('fileUpload').closest('.card');
+        uploadCard.after(alertDiv, container);
+      }
+
+      document.getElementById('fileUpload').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        if (!window.crypto || !window.crypto.subtle) {
+          alert('Your browser does not support the Web Crypto API. Please use a modern browser.');
+          return;
+        }
+
+        var fileInput = document.getElementById('fileToUpload');
+        var file = fileInput.files[0];
+        if (!file) return;
+
+        var allowedTypes = ['image/jpeg', 'image/png', 'application/pdf', 'text/plain'];
+        if (file.type && !allowedTypes.includes(file.type)) {
+          alert('File type not allowed. Allowed: JPEG, PNG, PDF, TXT');
+          return;
+        }
+
+        if (file.size > 10 * 1024 * 1024) {
+          alert('File is too large! Must be under 10MB.');
+          return;
+        }
+
+        var btn = this.querySelector('button[type="submit"]');
+        btn.disabled = true;
+        btn.textContent = 'Encrypting & uploading\u2026';
+
+        try {
+          var result = await encryptFile(file);
+
+          var formData = new FormData();
+          formData.append('fileToUpload', result.encryptedBlob, file.name);
+          formData.append('uploadPassword', document.getElementById('uploadPassword').value);
+          formData.append('uploadExpiry', document.getElementById('uploadExpiry').value);
+
+          var response = await fetch('upload.php', {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin'
+          });
+
+          var data = await response.json();
+          if (data.success) {
+            var link = window.location.origin + '/download.php?file=' + encodeURIComponent(data.shareToken) + '#' + result.keyString;
+            showUploadResult(link);
+            document.getElementById('fileUpload').reset();
+          } else {
+            alert('Upload failed: ' + (data.error || 'Unknown error'));
+          }
+        } catch (err) {
+          alert('Encryption or upload failed: ' + err.message);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Upload File';
+        }
+      });
       </script>
 
       <?php if (isset($_SESSION['upload_status'])): ?>
         <div class="alert alert-info"><?php echo htmlspecialchars($_SESSION['upload_status']); unset($_SESSION['upload_status']); ?></div>
-      <?php endif; ?>
-
-      <?php if (isset($_SESSION['download_link'])): ?>
-        <div class="download-link">
-          <strong>Download Link:</strong><br/>
-          <a href="<?php echo htmlspecialchars($_SESSION['download_link']); ?>" target="_blank">
-            <?php echo htmlspecialchars($_SESSION['download_link']); ?>
-          </a>
-        </div>
-        <?php unset($_SESSION['download_link']); ?>
       <?php endif; ?>
 
       <!-- Files Table -->

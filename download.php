@@ -6,9 +6,14 @@ if (!isset($_GET['file'])) {
     http_response_code(400);
     die("No file specified.");
 }
-$fileId = basename($_GET['file']);
+$shareToken = $_GET['file'];
 
-$file = execute_query("SELECT * FROM files WHERE id = ?", [$fileId]);
+if (!preg_match('/^[a-f0-9]{64}$/', $shareToken)) {
+    http_response_code(400);
+    die("Invalid file token.");
+}
+
+$file = execute_query("SELECT * FROM files WHERE share_token = ?", [$shareToken]);
 if (!$file) {
     http_response_code(404);
     die("File not found.");
@@ -22,6 +27,7 @@ if ($file['expires_at'] && strtotime($file['expires_at'] . ' UTC') < time()) {
 
 $displayName      = $file['original_name'];
 $passwordProtected = ! empty($file['password_hash']);
+$fileId            = $shareToken;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = $_POST['password'] ?? '';
@@ -30,7 +36,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
            : true;
 
     if ($ok) {
-        
+        if (!isset($_SESSION['unlocked_files'])) {
+            $_SESSION['unlocked_files'] = [];
+        }
+        $_SESSION['unlocked_files'][$shareToken] = time() + 300; // 5 min window
     } else {
         sleep(1);
     }
@@ -38,6 +47,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json');
     echo json_encode(['success' => $ok]);
     exit;
+}
+
+// For non-password-protected files, unlock automatically
+if (!$passwordProtected) {
+    if (!isset($_SESSION['unlocked_files'])) {
+        $_SESSION['unlocked_files'] = [];
+    }
+    $_SESSION['unlocked_files'][$shareToken] = time() + 300;
 }
 
 include __DIR__ . '/downloadView.php';

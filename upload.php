@@ -45,11 +45,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ? gmdate('Y-m-d H:i:s', time() + ($expiryDays * 86400))  // UTC
             : null;
 
+        $shareToken = bin2hex(random_bytes(32));
+
         $stmt = $pdo->prepare("
-            INSERT INTO files (user_id, original_name, stored_name, password_hash, expires_at)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO files (share_token, user_id, original_name, stored_name, password_hash, expires_at)
+            VALUES (?, ?, ?, ?, ?, ?)
         ");
         $stmt->execute([
+            $shareToken,
             $_SESSION['user_id'],
             $originalName,
             $storedName,
@@ -57,8 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $expiresAt
         ]);
 
-        $fileId = execute_query("SELECT id from files where stored_name = ?", [$storedName])[0]["id"];
-        $downloadLink = "http://" . $_SERVER['HTTP_HOST'] . "/download.php?file=" . urlencode($fileId);
+        $downloadLink = "http://" . $_SERVER['HTTP_HOST'] . "/download.php?file=" . urlencode($shareToken);
         $_SESSION['upload_status'] = "Upload successful";
         $_SESSION['download_link'] = $downloadLink; 
         header("Location: dashboard.php");

@@ -12,7 +12,7 @@ $user = execute_query("SELECT username FROM users WHERE id = ?", [$_SESSION['use
 $username = $user[0]['username'] ?? 'User';
 
 $files = execute_query("
-    SELECT id, original_name, password_hash, expires_at
+    SELECT id, share_token, original_name, password_hash, expires_at
     FROM files
     WHERE user_id = ? AND (expires_at IS NULL OR expires_at > (NOW() AT TIME ZONE 'UTC'))
 ", [$_SESSION['user_id']]);
@@ -107,7 +107,7 @@ $files = execute_query("
               <tr>
                 <td><?php echo htmlspecialchars($file['original_name']); ?></td>
                 <td>
-                  <a href="download.php?file=<?php echo urlencode($file['id']); ?>" target="_blank">Download</a>
+                  <a href="download.php?file=<?php echo urlencode($file['share_token']); ?>" target="_blank">Download</a>
                 </td>
                 <td>
                   <?php if (empty($file['password_hash'])): ?>

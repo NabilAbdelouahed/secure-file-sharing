@@ -11,6 +11,7 @@ RUN a2enmod rewrite
 
 # Harden session cookies globally
 RUN echo "session.cookie_httponly = 1" >> /usr/local/etc/php/conf.d/session.ini \
+    && echo "session.cookie_secure = 1" >> /usr/local/etc/php/conf.d/session.ini \
     && echo "session.cookie_samesite = Strict" >> /usr/local/etc/php/conf.d/session.ini \
     && echo "session.use_strict_mode = 1" >> /usr/local/etc/php/conf.d/session.ini \
     && echo "session.use_only_cookies = 1" >> /usr/local/etc/php/conf.d/session.ini

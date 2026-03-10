@@ -2,6 +2,8 @@
 session_start();
 header('X-Frame-Options: DENY');
 header("Content-Security-Policy: frame-ancestors 'none'");
+header('X-Content-Type-Options: nosniff');
+require_once(__DIR__ . '/auth/csrf.php');
 
 if (isset($_SESSION['user_id']) && time() < $_SESSION['expires_at']) {
     header("Location: " . (!empty($_SESSION['is_admin']) ? 'admin.php' : 'dashboard.php'));
@@ -34,6 +36,7 @@ if (isset($_SESSION['user_id']) && time() < $_SESSION['expires_at']) {
             <label for="password">Password</label>
             <input type="password" id="password" name="password" required>
           </div>
+          <?php echo csrf_field(); ?>
           <button type="submit" class="btn btn-primary">Log In</button>
         </form>
         <div class="divider">or</div>

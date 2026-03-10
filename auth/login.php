@@ -2,8 +2,11 @@
 session_start();
 
 require_once("../database/db.php");
+require_once(__DIR__ . '/csrf.php');
 
 function authenticate() {
+
+    csrf_check();
 
     if (isset($_POST["username"]) && isset($_POST["password"])) {
         $input_user = $_POST["username"];

@@ -1,5 +1,6 @@
 <?php
 require_once("./database/db.php");
+require_once(__DIR__ . '/auth/csrf.php');
 session_start();
 
 if (!isset($_SESSION['user_id']) || time() > $_SESSION['expires_at']) {
@@ -8,6 +9,7 @@ if (!isset($_SESSION['user_id']) || time() > $_SESSION['expires_at']) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['file_id'])) {
+    csrf_check();
     $fileId = (int) $_POST['file_id'];
 
     // Only update files that belong to the current user

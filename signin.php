@@ -2,7 +2,9 @@
 session_start();
 header('X-Frame-Options: DENY');
 header("Content-Security-Policy: frame-ancestors 'none'");
+header('X-Content-Type-Options: nosniff');
 require_once("./database/db.php");
+require_once(__DIR__ . '/auth/csrf.php');
 
 if (isset($_SESSION['user_id']) && time() < $_SESSION['expires_at']) {
     header("Location: " . (!empty($_SESSION['is_admin']) ? 'admin.php' : 'dashboard.php'));
@@ -10,6 +12,8 @@ if (isset($_SESSION['user_id']) && time() < $_SESSION['expires_at']) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    csrf_check();
 
     $username = $_POST['username'];
     $password = $_POST['password'];
@@ -78,6 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <label for="password2">Confirm Password</label>
           <input type="password" id="password2" name="password2" required minlength="8">
         </div>
+        <?php echo csrf_field(); ?>
         <button type="submit" class="btn btn-primary">Create Account</button>
       </form>
       <div class="divider">or</div>

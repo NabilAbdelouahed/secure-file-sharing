@@ -1,9 +1,11 @@
 <?php
 require_once("./database/db.php");
+require_once(__DIR__ . '/auth/csrf.php');
 
 session_start();
 header('X-Frame-Options: DENY');
 header("Content-Security-Policy: frame-ancestors 'none'");
+header('X-Content-Type-Options: nosniff');
 if (!isset($_SESSION['user_id']) || time() > $_SESSION['expires_at'] || empty($_SESSION['is_admin'])) {
     header("Location: index.php");
     exit;
@@ -40,6 +42,7 @@ $recentFiles = execute_query("
         <div class="topbar-actions">
             <span class="topbar-user"><?php echo htmlspecialchars($adminUsername); ?></span>
             <form method="post" action="./auth/logout.php" style="margin:0">
+                <?php echo csrf_field(); ?>
                 <button type="submit" class="btn-logout">Logout</button>
             </form>
         </div>
@@ -118,6 +121,7 @@ $recentFiles = execute_query("
         <div class="card">
             <h3 class="section-title">Change Password</h3>
             <form id="changePassword" method="post" action="./auth/change_password.php">
+                <?php echo csrf_field(); ?>
                 <div class="form-group">
                     <input type="password" name="current_password" class="form-control" placeholder="Current password" required>
                 </div>

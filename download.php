@@ -1,9 +1,11 @@
 <?php
 require_once('./database/db.php');
+require_once(__DIR__ . '/auth/csrf.php');
 session_start();
 
 header('X-Frame-Options: DENY');
 header("Content-Security-Policy: frame-ancestors 'none'");
+header('X-Content-Type-Options: nosniff');
 
 if (!isset($_GET['file'])) {
     http_response_code(400);
@@ -67,6 +69,14 @@ if (isset($_GET['download']) && $_GET['download'] === '1') {
 
 // --- Handle password verification (AJAX POST) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $csrfToken = $_POST['csrf_token'] ?? '';
+    if (!isset($_SESSION['csrf_token']) || $csrfToken === '' || !hash_equals($_SESSION['csrf_token'], $csrfToken)) {
+        header('Content-Type: application/json');
+        http_response_code(403);
+        echo json_encode(['success' => false, 'error' => 'Invalid request.']);
+        exit;
+    }
+
     $input = $_POST['password'] ?? '';
     $ok    = $passwordProtected
            ? password_verify($input, $file['password_hash'])

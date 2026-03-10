@@ -89,6 +89,7 @@
 
   <script>
   (async function promptAndCheck() {
+    var csrfToken    = <?= json_encode(csrf_token()) ?>;
     var isProtected  = <?= $passwordProtected ? 'true' : 'false' ?>;
     var statusEl     = document.getElementById('status');
     var btnEl        = document.getElementById('downloadBtn');
@@ -178,7 +179,7 @@
         setTimeout(promptAndCheck, 1000);
       }
     };
-    xhr.send("password=" + encodeURIComponent(pwd));
+    xhr.send("password=" + encodeURIComponent(pwd) + "&csrf_token=" + encodeURIComponent(csrfToken));
   })();
   </script>
 </body>

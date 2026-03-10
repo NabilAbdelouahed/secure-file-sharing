@@ -14,7 +14,8 @@ try {
     );
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
-    die("DB connection failed: " . $e->getMessage());
+    error_log("DB connection failed: " . $e->getMessage());
+    die("A database error occurred. Please try again later.");
 }
 
 function execute_query($query, $params = []) {

@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once("../database/db.php");
+require_once(__DIR__ . '/csrf.php');
 
 if (!isset($_SESSION['user_id']) || time() > $_SESSION['expires_at']) {
     header("Location: ../index.php");
@@ -13,6 +14,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: $redirect");
     exit;
 }
+
+csrf_check();
 
 $currentPassword = $_POST['current_password'] ?? '';
 $newPassword = $_POST['new_password'] ?? '';

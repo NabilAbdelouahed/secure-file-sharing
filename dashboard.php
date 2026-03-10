@@ -1,10 +1,12 @@
 <?php
 
 require_once("./database/db.php");
+require_once(__DIR__ . '/auth/csrf.php');
 
 session_start();
 header('X-Frame-Options: DENY');
 header("Content-Security-Policy: frame-ancestors 'none'");
+header('X-Content-Type-Options: nosniff');
 if (!isset($_SESSION['user_id']) || time() > $_SESSION['expires_at']) {
     header("Location: index.php");
     exit;
@@ -35,8 +37,7 @@ $files = execute_query("
       <div class="topbar-brand">SecureShare</div>
       <div class="topbar-actions">
         <span class="topbar-user"><?php echo htmlspecialchars($username); ?></span>
-        <form method="post" action="./auth/logout.php" style="margin:0">
-          <button type="submit" class="btn-logout">Logout</button>
+        <form method="post" action="./auth/logout.php" style="margin:0">            <?php echo csrf_field(); ?>          <button type="submit" class="btn-logout">Logout</button>
         </form>
       </div>
     </nav>
@@ -46,6 +47,7 @@ $files = execute_query("
       <div class="card">
         <h3 class="section-title">Upload File</h3>
         <form id="fileUpload" action="upload.php" method="post" enctype="multipart/form-data">
+          <?php echo csrf_field(); ?>
           <div class="form-group">
             <label for="fileToUpload">Select file (max 10MB)</label>
             <input type="file" name="fileToUpload" id="fileToUpload" class="form-control" required onchange="validateFileSize(this)">
@@ -144,6 +146,7 @@ $files = execute_query("
           formData.append('fileToUpload', result.encryptedBlob, file.name);
           formData.append('uploadPassword', document.getElementById('uploadPassword').value);
           formData.append('uploadExpiry', document.getElementById('uploadExpiry').value);
+          formData.append('csrf_token', document.querySelector('#fileUpload input[name="csrf_token"]').value);
 
           var response = await fetch('upload.php', {
             method: 'POST',
@@ -214,6 +217,7 @@ $files = execute_query("
                 </td>
                 <td>
                   <form method="post" action="expireFile.php" style="margin:0">
+                    <?php echo csrf_field(); ?>
                     <input type="hidden" name="file_id" value="<?php echo (int)$file['id']; ?>">
                     <button type="submit" class="btn btn-danger">Expire</button>
                   </form>
@@ -259,6 +263,7 @@ $files = execute_query("
       <div class="card">
         <h3 class="section-title">Change Password</h3>
         <form id="changePassword" method="post" action="./auth/change_password.php">
+          <?php echo csrf_field(); ?>
           <div class="form-group">
             <input type="password" name="current_password" class="form-control" placeholder="Current password" required>
           </div>

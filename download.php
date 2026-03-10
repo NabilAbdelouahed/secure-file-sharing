@@ -15,7 +15,7 @@ if (!$file) {
 }
 $file = $file[0];
 
-if ($file['expires_at'] && strtotime($file['expires_at']) < time()) {
+if ($file['expires_at'] && strtotime($file['expires_at'] . ' UTC') < time()) {
     http_response_code(410);
     die("File has expired.");
 }

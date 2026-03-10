@@ -14,7 +14,7 @@ $username = $user[0]['username'] ?? 'User';
 $files = execute_query("
     SELECT id, original_name, password_hash, expires_at
     FROM files
-    WHERE user_id = ? AND (expires_at IS NULL OR expires_at > NOW())
+    WHERE user_id = ? AND (expires_at IS NULL OR expires_at > (NOW() AT TIME ZONE 'UTC'))
 ", [$_SESSION['user_id']]);
 
 ?>
@@ -97,11 +97,11 @@ $files = execute_query("
               </td>
               <td><?php echo empty($file['password_hash']) ? 'No' : 'Yes'; ?></td>
               <td>
-                <?php
-                  echo $file['expires_at']
-                    ? htmlspecialchars(date('Y-m-d H:i', strtotime($file['expires_at'])))
-                    : 'Never';
-                ?>
+                <?php if ($file['expires_at']): ?>
+                  <span class="utc-date" data-utc="<?php echo htmlspecialchars($file['expires_at']); ?>"></span>
+                <?php else: ?>
+                  Never
+                <?php endif; ?>
               </td>
               <td>
                 <form method="post" action="expireFile.php" style="margin:0">
@@ -116,6 +116,19 @@ $files = execute_query("
     <?php else: ?>
       <p style="text-align: center;">You have no active files.</p>
     <?php endif; ?>
+
+    <script>
+    document.querySelectorAll('.utc-date').forEach(function(el) {
+      var utc = el.getAttribute('data-utc');
+      var date = new Date(utc + 'Z');
+      var year = date.getFullYear();
+      var month = String(date.getMonth() + 1).padStart(2, '0');
+      var day = String(date.getDate()).padStart(2, '0');
+      var hours = String(date.getHours()).padStart(2, '0');
+      var minutes = String(date.getMinutes()).padStart(2, '0');
+      el.textContent = year + '-' + month + '-' + day + ' ' + hours + ':' + minutes;
+    });
+    </script>
 
     <form method="post" action="./auth/logout.php">
       <button type="submit">Logout</button>

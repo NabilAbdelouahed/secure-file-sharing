@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $expiryDays = intval($_POST['uploadExpiry'] ?? 0);
         $expiresAt = ($expiryDays > 0)
-            ? date('Y-m-d H:i:s', time() + ($expiryDays * 86400))  // In seconds
+            ? gmdate('Y-m-d H:i:s', time() + ($expiryDays * 86400))  // UTC
             : null;
 
         $stmt = $pdo->prepare("

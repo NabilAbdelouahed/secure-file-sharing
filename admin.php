@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id']) || time() > $_SESSION['expires_at'] || empty($_
 
 $totalUsers = execute_query("SELECT COUNT(*) AS count FROM users")[0]['count'];
 $totalFiles = execute_query("SELECT COUNT(*) AS count FROM files")[0]['count'];
-$activeFiles = execute_query("SELECT COUNT(*) AS count FROM files WHERE expires_at IS NULL OR expires_at > NOW()")[0]['count'];
+$activeFiles = execute_query("SELECT COUNT(*) AS count FROM files WHERE expires_at IS NULL OR expires_at > (NOW() AT TIME ZONE 'UTC')")[0]['count'];
 $expiredFiles = $totalFiles - $activeFiles;
 
 $recentFiles = execute_query("
@@ -95,11 +95,11 @@ $recentFiles = execute_query("
                 <td><?php echo htmlspecialchars($file['original_name']); ?></td>
                 <td><?php echo htmlspecialchars($file['username']); ?></td>
                 <td>
-                    <?php
-                        echo $file['expires_at']
-                            ? htmlspecialchars(date('Y-m-d H:i', strtotime($file['expires_at'])))
-                            : 'Never';
-                    ?>
+                    <?php if ($file['expires_at']): ?>
+                      <span class="utc-date" data-utc="<?php echo htmlspecialchars($file['expires_at']); ?>"></span>
+                    <?php else: ?>
+                      Never
+                    <?php endif; ?>
                 </td>
             </tr>
             <?php endforeach; ?>
@@ -108,6 +108,19 @@ $recentFiles = execute_query("
     <?php else: ?>
         <p style="text-align: center;">No files uploaded yet.</p>
     <?php endif; ?>
+
+    <script>
+    document.querySelectorAll('.utc-date').forEach(function(el) {
+      var utc = el.getAttribute('data-utc');
+      var date = new Date(utc + 'Z');
+      var year = date.getFullYear();
+      var month = String(date.getMonth() + 1).padStart(2, '0');
+      var day = String(date.getDate()).padStart(2, '0');
+      var hours = String(date.getHours()).padStart(2, '0');
+      var minutes = String(date.getMinutes()).padStart(2, '0');
+      el.textContent = year + '-' + month + '-' + day + ' ' + hours + ':' + minutes;
+    });
+    </script>
 
     <form method="post" action="./auth/logout.php">
         <button type="submit">Logout</button>

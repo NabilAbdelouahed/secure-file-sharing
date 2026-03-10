@@ -130,6 +130,17 @@ $files = execute_query("
     });
     </script>
 
+    <h3>Change Password</h3>
+    <form id="changePassword" method="post" action="./auth/change_password.php">
+      <input type="password" name="current_password" placeholder="Current password" required><br/>
+      <input type="password" name="new_password" placeholder="New password (min 8 chars)" required minlength="8"><br/>
+      <input type="password" name="confirm_password" placeholder="Confirm new password" required minlength="8"><br/>
+      <input type="submit" value="Change Password">
+    </form>
+    <?php if (isset($_SESSION['password_status'])): ?>
+      <p id="passwordStatus"><?php echo htmlspecialchars($_SESSION['password_status']); unset($_SESSION['password_status']); ?></p>
+    <?php endif; ?>
+
     <form method="post" action="./auth/logout.php">
       <button type="submit">Logout</button>
     </form>

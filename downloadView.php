@@ -88,7 +88,7 @@
   </div>
 
   <script>
-  (function promptAndCheck() {
+  (async function promptAndCheck() {
     var isProtected  = <?= $passwordProtected ? 'true' : 'false' ?>;
     var statusEl     = document.getElementById('status');
     var btnEl        = document.getElementById('downloadBtn');

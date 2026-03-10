@@ -2,6 +2,8 @@
 require_once("./database/db.php");
 
 session_start();
+header('X-Frame-Options: DENY');
+header("Content-Security-Policy: frame-ancestors 'none'");
 if (!isset($_SESSION['user_id']) || time() > $_SESSION['expires_at'] || empty($_SESSION['is_admin'])) {
     header("Location: index.php");
     exit;

@@ -2,6 +2,9 @@
 require_once('./database/db.php');
 session_start();
 
+header('X-Frame-Options: DENY');
+header("Content-Security-Policy: frame-ancestors 'none'");
+
 if (!isset($_GET['file'])) {
     http_response_code(400);
     die("No file specified.");
@@ -13,7 +16,7 @@ if (!preg_match('/^[a-f0-9]{64}$/', $shareToken)) {
     die("Invalid file token.");
 }
 
-$file = execute_query("SELECT * FROM files WHERE share_token = ?", [$shareToken]);
+$file = execute_query("SELECT original_name, stored_name, password_hash, expires_at, user_id FROM files WHERE share_token = ?", [$shareToken]);
 if (!$file) {
     http_response_code(404);
     die("File not found.");
@@ -42,7 +45,7 @@ if (isset($_GET['download']) && $_GET['download'] === '1') {
         unset($_SESSION['unlocked_files'][$shareToken]);
     }
 
-    $storedName = $file['stored_name'];
+    $storedName = basename($file['stored_name']);
     $filePath   = __DIR__ . "/uploads/" . $storedName;
 
     if (!is_file($filePath)) {
@@ -50,9 +53,10 @@ if (isset($_GET['download']) && $_GET['download'] === '1') {
         die("File missing on server.");
     }
 
+    $safeName = preg_replace('/[\r\n"\\]/', '_', basename($displayName));
     header('Content-Description: File Transfer');
     header('Content-Type: application/octet-stream');
-    header('Content-Disposition: attachment; filename="' . basename($displayName) . '"');
+    header('Content-Disposition: attachment; filename="' . $safeName . '"');
     header('Expires: 0');
     header('Cache-Control: must-revalidate');
     header('Pragma: public');

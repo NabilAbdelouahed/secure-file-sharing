@@ -3,6 +3,8 @@
 require_once("./database/db.php");
 
 session_start();
+header('X-Frame-Options: DENY');
+header("Content-Security-Policy: frame-ancestors 'none'");
 if (!isset($_SESSION['user_id']) || time() > $_SESSION['expires_at']) {
     header("Location: index.php");
     exit;
@@ -100,8 +102,8 @@ $files = execute_query("
         container.appendChild(document.createElement('br'));
 
         var warning = document.createElement('small');
-        warning.style.color = '#ef4444';
-        warning.textContent = '\u26A0 Save this link! It contains the encryption key (after #). Without it, the file cannot be decrypted.';
+        warning.style.color = '#059669';
+        warning.textContent = 'Encryption key stored in your browser. Share this link to give others access.';
         container.appendChild(warning);
 
         var uploadCard = document.getElementById('fileUpload').closest('.card');
@@ -151,9 +153,13 @@ $files = execute_query("
 
           var data = await response.json();
           if (data.success) {
+            // Store encryption key in browser only — never sent to server
+            try { localStorage.setItem('ek_' + data.shareToken, result.keyString); } catch(e) {}
             var link = window.location.origin + '/download.php?file=' + encodeURIComponent(data.shareToken) + '#' + result.keyString;
             showUploadResult(link);
             document.getElementById('fileUpload').reset();
+            // Reload to show the new file in the table with key attached
+            window.location.reload();
           } else {
             alert('Upload failed: ' + (data.error || 'Unknown error'));
           }
@@ -190,7 +196,7 @@ $files = execute_query("
               <tr>
                 <td><?php echo htmlspecialchars($file['original_name']); ?></td>
                 <td>
-                  <a href="download.php?file=<?php echo urlencode($file['share_token']); ?>" target="_blank">Download</a>
+                  <a class="file-download" href="download.php?file=<?php echo urlencode($file['share_token']); ?>" data-token="<?php echo htmlspecialchars($file['share_token'], ENT_QUOTES); ?>" target="_blank">Download</a>
                 </td>
                 <td>
                   <?php if (empty($file['password_hash'])): ?>
@@ -223,6 +229,20 @@ $files = execute_query("
       </div>
 
       <script>
+      // Attach encryption keys from localStorage to download links
+      document.querySelectorAll('.file-download').forEach(function(a) {
+        var token = a.getAttribute('data-token');
+        if (token) {
+          var key = null;
+          try { key = localStorage.getItem('ek_' + token); } catch(e) {}
+          if (key) {
+            a.href = a.href.split('#')[0] + '#' + key;
+          } else {
+            a.title = 'Encryption key not found in this browser';
+          }
+        }
+      });
+
       document.querySelectorAll('.utc-date').forEach(function(el) {
         var utc = el.getAttribute('data-utc');
         var date = new Date(utc + 'Z');

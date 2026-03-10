@@ -77,7 +77,7 @@
     function showButton() {
       btnEl.style.display = 'inline-block';
       btnEl.onclick = function() {
-        window.location.href = "serve.php?file=" + encodeURIComponent(fileId);
+        window.location.href = "download.php?file=" + encodeURIComponent(fileId) + "&download=1";
       };
     }
 

@@ -29,6 +29,39 @@ $displayName      = $file['original_name'];
 $passwordProtected = ! empty($file['password_hash']);
 $fileId            = $shareToken;
 
+// --- Handle actual file download ---
+if (isset($_GET['download']) && $_GET['download'] === '1') {
+    // Password-protected files must be unlocked first
+    if ($passwordProtected) {
+        if (!isset($_SESSION['unlocked_files'][$shareToken]) || $_SESSION['unlocked_files'][$shareToken] < time()) {
+            unset($_SESSION['unlocked_files'][$shareToken]);
+            http_response_code(403);
+            die("Access denied. Please verify the password first.");
+        }
+        // Consume the unlock (one-time use)
+        unset($_SESSION['unlocked_files'][$shareToken]);
+    }
+
+    $storedName = $file['stored_name'];
+    $filePath   = __DIR__ . "/uploads/" . $storedName;
+
+    if (!is_file($filePath)) {
+        http_response_code(404);
+        die("File missing on server.");
+    }
+
+    header('Content-Description: File Transfer');
+    header('Content-Type: application/octet-stream');
+    header('Content-Disposition: attachment; filename="' . basename($displayName) . '"');
+    header('Expires: 0');
+    header('Cache-Control: must-revalidate');
+    header('Pragma: public');
+    header('Content-Length: ' . filesize($filePath));
+    readfile($filePath);
+    exit;
+}
+
+// --- Handle password verification (AJAX POST) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = $_POST['password'] ?? '';
     $ok    = $passwordProtected
@@ -49,12 +82,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-// For non-password-protected files, unlock automatically
-if (!$passwordProtected) {
-    if (!isset($_SESSION['unlocked_files'])) {
-        $_SESSION['unlocked_files'] = [];
-    }
-    $_SESSION['unlocked_files'][$shareToken] = time() + 300;
-}
-
+// --- Show download page ---
 include __DIR__ . '/downloadView.php';

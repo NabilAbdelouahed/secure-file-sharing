@@ -53,7 +53,7 @@ if (isset($_GET['download']) && $_GET['download'] === '1') {
         die("File missing on server.");
     }
 
-    $safeName = preg_replace('/[\r\n"\\]/', '_', basename($displayName));
+    $safeName = preg_replace('/[\r\n"\\\\]/', '_', basename($displayName));
     header('Content-Description: File Transfer');
     header('Content-Type: application/octet-stream');
     header('Content-Disposition: attachment; filename="' . $safeName . '"');

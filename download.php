@@ -43,8 +43,6 @@ if (isset($_GET['download']) && $_GET['download'] === '1') {
             http_response_code(403);
             die("Access denied. Please verify the password first.");
         }
-        // Consume the unlock (one-time use)
-        unset($_SESSION['unlocked_files'][$shareToken]);
     }
 
     $storedName = basename($file['stored_name']);

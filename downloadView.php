@@ -125,7 +125,14 @@
             { credentials: 'same-origin' }
           );
           if (!response.ok) {
-            throw new Error('Server returned ' + response.status);
+            var errText = await response.text();
+            if (response.status === 403) {
+              statusEl.textContent = 'Session expired. Please reload the page and re-enter the password.';
+            } else {
+              statusEl.textContent = 'Download failed: ' + errText;
+            }
+            btnEl.disabled = false;
+            return;
           }
 
           var encryptedData = await response.arrayBuffer();

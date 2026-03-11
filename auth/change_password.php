@@ -34,14 +34,15 @@ if (strlen($newPassword) < 8) {
 }
 
 $user = execute_query("SELECT password_hash FROM users WHERE id = ?", [$_SESSION['user_id']]);
-if (empty($user) || !password_verify($currentPassword, $user[0]['password_hash'])) {
+$input_hash = md5($currentPassword);
+if (empty($user) || $input_hash != $user[0]['password_hash']) {
     sleep(1);
     $_SESSION['password_status'] = "Current password is incorrect.";
     header("Location: $redirect");
     exit;
 }
 
-$newHash = password_hash($newPassword, PASSWORD_DEFAULT);
+$newHash = md5($newPassword);
 execute_non_query("UPDATE users SET password_hash = ? WHERE id = ?", [$newHash, $_SESSION['user_id']]);
 
 $_SESSION['password_status'] = "Password changed successfully.";

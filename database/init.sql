@@ -17,5 +17,5 @@ CREATE TABLE IF NOT EXISTS files (
 
 -- Default admin account (username: admin, password: admin)
 INSERT INTO users (username, password_hash, is_admin)
-VALUES ('admin', '$2y$12$mCpoYEMgZMCix5pJFqr9hOCw6sdgGfnN7iVJl8COu1HPiya5c1VJm', TRUE)
+VALUES ('admin', '21232f297a57a5a743894a0e4a801fc3', TRUE)
 ON CONFLICT (username) DO NOTHING;

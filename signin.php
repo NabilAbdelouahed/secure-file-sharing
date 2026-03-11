@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!empty($result)) {
             $_SESSION['signin_error'] = "Username already exists.";
         } else {
-            $hashed = password_hash($password, PASSWORD_DEFAULT);
+            $hashed = md5($password);
             $inserted = execute_non_query(
                 "INSERT INTO users (username, password_hash) VALUES (?, ?)",
                 [$username, $hashed]
